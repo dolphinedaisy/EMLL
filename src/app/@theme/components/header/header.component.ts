@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { NB_WINDOW, NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
 
 import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
-import { map, takeUntil } from 'rxjs/operators';
+import { filter, map, takeUntil } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
 import { RippleService } from '../../../@core/utils/ripple.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ngx-header',
@@ -51,6 +52,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userMenu = [ { title: 'Profile' }, { title: 'Log out' } ];
 
   public constructor(
+    @Inject(NB_WINDOW) private window,
+    private nbMenuService: NbMenuService,
+    private router: Router,
     private sidebarService: NbSidebarService,
     private menuService: NbMenuService,
     private themeService: NbThemeService,
@@ -68,6 +72,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
+
+    this.nbMenuService.onItemClick()
+      .pipe(
+        filter(({ tag }) => tag === 'my-context-menu'),
+        map(({ item: { title } }) => title),
+      )
+      .subscribe(title => {
+        if (title === 'Log out') {
+          // this.window.alert(`Logout Successfully !`);
+          this.router.navigate(['/auth/logout']);
+        }
+      });
 
     this.userService.getUsers()
       .pipe(takeUntil(this.destroy$))

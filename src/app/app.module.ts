@@ -20,6 +20,10 @@ import {
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AuthGuard } from './auth-guard.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,6 +32,18 @@ import {
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
+    AngularFireModule.initializeApp({
+      apiKey: 'AIzaSyAPnRC3ntCui8WM_47M9fZEhQJncRo0YEM',
+      authDomain: 'emll-cb41e.firebaseapp.com',
+      databaseURL: 'https://emll-cb41e.firebaseio.com',
+      projectId: 'emll-cb41e',
+      storageBucket: 'emll-cb41e.appspot.com',
+      messagingSenderId: '337337820910',
+      appId: '1:337337820910:web:079fb1059c18ba6ae435ff',
+    }),
+    AngularFireAuthModule,
+    AngularFireDatabaseModule,
+
     NbSidebarModule.forRoot(),
     NbMenuModule.forRoot(),
     NbDatepickerModule.forRoot(),
@@ -39,6 +55,9 @@ import {
     }),
     CoreModule.forRoot(),
     ThemeModule.forRoot(),
+  ],
+  providers: [
+    AuthGuard,
   ],
   bootstrap: [AppComponent],
 })

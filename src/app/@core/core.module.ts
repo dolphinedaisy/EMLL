@@ -54,6 +54,7 @@ import { VisitorsAnalyticsService } from './mock/visitors-analytics.service';
 import { SecurityCamerasService } from './mock/security-cameras.service';
 import { RippleService } from './utils/ripple.service';
 import { MockDataModule } from './mock/mock-data.module';
+import { NbFirebaseAuthModule, NbFirebaseGoogleStrategy, NbFirebasePasswordStrategy } from '@nebular/firebase-auth';
 
 const socialLinks = [
   {
@@ -106,22 +107,80 @@ export class NbSimpleRoleProvider extends NbRoleProvider {
 export const NB_CORE_PROVIDERS = [
   ...MockDataModule.forRoot().providers,
   ...DATA_SERVICES,
+  NbFirebaseAuthModule,
   ...NbAuthModule.forRoot({
 
-    strategies: [
-      NbDummyAuthStrategy.setup({
-        name: 'email',
-        delay: 3000,
-      }),
-    ],
     forms: {
       login: {
-        socialLinks: socialLinks,
+        strategy: 'password',
+        rememberMe: true,
+        socialLinks: [],
       },
       register: {
-        socialLinks: socialLinks,
+        strategy: 'password',
+        terms: true,
+        socialLinks: [],
+      },
+      logout: {
+        strategy: 'password',
+      },
+      requestPassword: {
+        strategy: 'password',
+        socialLinks: [],
+      },
+      resetPassword: {
+        strategy: 'password',
+        socialLinks: [],
+      },
+      validation: {
+        password: {
+          required: true,
+          minLength: 6,
+          maxLength: 50,
+        },
+        email: {
+          required: true,
+        },
+        fullName: {
+          required: false,
+          minLength: 4,
+          maxLength: 50,
+        },
       },
     },
+    strategies: [
+      NbFirebasePasswordStrategy.setup({
+        name: 'password',
+        login: {
+          redirect: {
+            success: '/pages',
+          },
+        },
+        register: {
+          redirect: {
+            success: '/pages',
+          },
+        },
+        logout: {
+          redirect: {
+            success: '',
+          },
+        },
+        requestPassword: {
+          redirect: {
+            success: '/auth',
+          },
+        },
+        resetPassword: {
+          redirect: {
+            success: '/auth',
+          },
+        },
+      }),
+      NbFirebaseGoogleStrategy.setup({
+        name: 'google',
+      }),
+    ],
   }).providers,
 
   NbSecurityModule.forRoot({
@@ -154,6 +213,10 @@ export const NB_CORE_PROVIDERS = [
   ],
   exports: [
     NbAuthModule,
+  ],
+  providers: [
+    NbFirebasePasswordStrategy,
+    NbFirebaseGoogleStrategy,
   ],
   declarations: [],
 })
